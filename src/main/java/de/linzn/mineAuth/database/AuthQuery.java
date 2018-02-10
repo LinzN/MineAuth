@@ -20,6 +20,7 @@ public class AuthQuery {
 
     private static String KEY_FIELD = "userOption39";
     private static String USERNAME_FIELD = "userOption30";
+    private static String IS_AUTH_FIELD = "userOption40";
 
     public static boolean isAuth(UUID playerUUID) {
         boolean isAuth = false;
@@ -84,12 +85,32 @@ public class AuthQuery {
         return wsID;
     }
 
-    public static boolean setUsername(int wsID, String userName) {
+    public static String getWSAccountName(int userID) {
+        ConnectionManager manager = ConnectionManager.DEFAULT;
+        String wsName = null;
+        try {
+            Connection conn = manager.getConnection("mineAuthWS");
+            PreparedStatement sql = conn.prepareStatement(
+                    "SELECT username FROM wcf1_user WHERE userID = " + userID + ";");
+            ResultSet result = sql.executeQuery();
+            if (result.next()) {
+                wsName = result.getString("username");
+            }
+            result.close();
+            sql.close();
+            manager.release("mineAuthWS", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return wsName;
+    }
+
+    public static boolean updateWSAccount(int wsID, String userName) {
         ConnectionManager manager = ConnectionManager.DEFAULT;
         try {
 
             Connection conn = manager.getConnection("mineAuthWS");
-            PreparedStatement sql = conn.prepareStatement("UPDATE wcf1_user_option_value SET " + USERNAME_FIELD + " = '" + userName + "' WHERE userID = " + wsID);
+            PreparedStatement sql = conn.prepareStatement("UPDATE wcf1_user_option_value SET " + USERNAME_FIELD + " = '" + userName + "', " + IS_AUTH_FIELD + " = '" + 1 + "' WHERE userID = " + wsID);
             /* Execute query*/
             sql.executeUpdate();
             sql.close();

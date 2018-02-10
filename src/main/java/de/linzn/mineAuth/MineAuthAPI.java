@@ -22,15 +22,22 @@ public class MineAuthAPI {
             return;
         }
 
+        String wsName = AuthQuery.getWSAccountName(userID);
+
+        if (wsName == null) {
+            player.sendMessage("" + ChatColor.RED + ChatColor.BOLD + "Es ist ein Fehler aufgetreten Type 0");
+            return;
+        }
+
         if (!AuthQuery.saveAuth(playerUUID, userID, auth_key)) {
             player.sendMessage("" + ChatColor.DARK_RED + ChatColor.BOLD + "Es ist ein Fehler aufgetreten Type 1");
             return;
         }
-        if (!AuthQuery.setUsername(userID, player.getName())) {
+        if (!AuthQuery.updateWSAccount(userID, player.getName())) {
             player.sendMessage("" + ChatColor.DARK_RED + ChatColor.BOLD + "Es ist ein Fehler aufgetreten Type 2");
             return;
         }
 
-        player.sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "Du hast dich erfolgreich mit deinem Forenaccount verbunden!");
+        player.sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "Du hast dich erfolgreich mit deinem Forenaccount " + ChatColor.YELLOW + wsName + ChatColor.GREEN + ChatColor.BOLD + " verbunden!");
     }
 }
