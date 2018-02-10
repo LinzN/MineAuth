@@ -42,6 +42,26 @@ public class AuthQuery {
         return isAuth;
     }
 
+    public static boolean isAlreadyAuth(int userID) {
+        boolean isAuth = false;
+        ConnectionManager manager = ConnectionManager.DEFAULT;
+        try {
+            Connection conn = manager.getConnection("mineAuth");
+            PreparedStatement sql = conn.prepareStatement(
+                    "SELECT * FROM connected_ws_user WHERE wsID = '" + userID + "';");
+            ResultSet result = sql.executeQuery();
+            if (result.next()) {
+                isAuth = true;
+            }
+            result.close();
+            sql.close();
+            manager.release("mineAuth", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isAuth;
+    }
+
     public static boolean saveAuth(UUID playerUUID, int wsID, String auth_key) {
         ConnectionManager manager = ConnectionManager.DEFAULT;
         try {
@@ -84,6 +104,7 @@ public class AuthQuery {
         }
         return wsID;
     }
+
 
     public static String getWSAccountName(int userID) {
         ConnectionManager manager = ConnectionManager.DEFAULT;

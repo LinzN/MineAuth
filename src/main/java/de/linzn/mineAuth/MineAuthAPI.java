@@ -22,6 +22,11 @@ public class MineAuthAPI {
             return;
         }
 
+        if (AuthQuery.isAlreadyAuth(userID)) {
+            player.sendMessage("" + ChatColor.RED + ChatColor.BOLD + "Auf diesen Forenaccount wurde bereits ein ingame Account verbunden!");
+            return;
+        }
+
         String wsName = AuthQuery.getWSAccountName(userID);
 
         if (wsName == null) {
