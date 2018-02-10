@@ -1,0 +1,4 @@
+name: MineAuth
+main : de.linzn.mineAuth.MineAuthPlugin
+version: ${project.version}
+author: Kekshaus
