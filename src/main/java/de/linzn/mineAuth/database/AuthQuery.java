@@ -21,6 +21,7 @@ public class AuthQuery {
     private static String KEY_FIELD = "userOption39";
     private static String USERNAME_FIELD = "userOption30";
     private static String IS_AUTH_FIELD = "userOption40";
+    private static String GUILD_FIELD = "userOption35";
 
     public static boolean isAuth(UUID playerUUID) {
         boolean isAuth = false;
@@ -60,6 +61,26 @@ public class AuthQuery {
             e.printStackTrace();
         }
         return isAuth;
+    }
+
+    public static int getWbbID(UUID uuid) {
+        int id = -1;
+        ConnectionManager manager = ConnectionManager.DEFAULT;
+        try {
+            Connection conn = manager.getConnection("mineAuth");
+            PreparedStatement sql = conn.prepareStatement(
+                    "SELECT * FROM connected_ws_user WHERE uuid = '" + uuid.toString() + "';");
+            ResultSet result = sql.executeQuery();
+            if (result.next()) {
+                id = result.getInt("wsID");
+            }
+            result.close();
+            sql.close();
+            manager.release("mineAuth", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     public static boolean saveAuth(UUID playerUUID, int wsID, String auth_key) {
@@ -126,12 +147,17 @@ public class AuthQuery {
         return wsName;
     }
 
-    public static boolean updateWSAccount(int wsID, String userName) {
+    public static boolean updateWSAccount(int wsID, String userName, String guildName) {
         ConnectionManager manager = ConnectionManager.DEFAULT;
         try {
 
             Connection conn = manager.getConnection("mineAuthWS");
-            PreparedStatement sql = conn.prepareStatement("UPDATE wcf1_user_option_value SET " + USERNAME_FIELD + " = '" + userName + "', " + IS_AUTH_FIELD + " = '" + 1 + "' WHERE userID = " + wsID);
+            PreparedStatement sql;
+            if(guildName != null){
+                sql = conn.prepareStatement("UPDATE wcf1_user_option_value SET " + USERNAME_FIELD + " = '" + userName + "', " + GUILD_FIELD + " = '" + guildName + "', " + IS_AUTH_FIELD + " = '" + 1 + "' WHERE userID = " + wsID);
+            } else {
+                sql = conn.prepareStatement("UPDATE wcf1_user_option_value SET " + USERNAME_FIELD + " = '" + userName + "', " + GUILD_FIELD + " = '" + "Keine" + "', " + IS_AUTH_FIELD + " = '" + 1 + "' WHERE userID = " + wsID);
+            }
             /* Execute query*/
             sql.executeUpdate();
             sql.close();
